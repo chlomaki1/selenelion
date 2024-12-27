@@ -1,16 +1,9 @@
 cmake_minimum_required(VERSION 3.21)
-project(discord LANGUAGES C CXX)
 
-# 1) Create an IMPORTED library target for Discord
-add_library(${PROJECT_NAME} SHARED IMPORTED)
+project(discord-sdk)
 
-# 2) Point to the actual .dll and .lib
-set_target_properties(${PROJECT_NAME} PROPERTIES
-        IMPORTED_LOCATION  "${CMAKE_CURRENT_SOURCE_DIR}/discord_game_sdk.dll"
-        IMPORTED_IMPLIB    "${CMAKE_CURRENT_SOURCE_DIR}/discord_game_sdk.dll.lib"
-)
+file(GLOB_RECURSE DISCORD "src/*.cpp", "/src/*.h")
 
-# 3) Provide an include directory so anyone linking "discord" can see the headers
-target_include_directories(${PROJECT_NAME} INTERFACE
-        "${CMAKE_CURRENT_SOURCE_DIR}/src"
-)
+add_library(${PROJECT_NAME} ${DISCORD})
+target_include_directories(${PROJECT_NAME} INTERFACE "src")
+target_link_libraries(discord-sdk "${CMAKE_CURRENT_SOURCE_DIR}/lib/discord_game_sdk.dll.lib")

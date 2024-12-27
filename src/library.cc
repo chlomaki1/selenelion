@@ -19,9 +19,19 @@ DWORD WINAPI state_loop(void* hModule) {
     freopen_s(reinterpret_cast<FILE**>(stdin), "CONIN$", "r", stdin);
 
     while (State::instance().isRunning()) {
-        if (State::instance().getPreviousState() != State::instance().getInternalState()) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+        if (State::instance().getState() != State::instance().getInternalState()) {
             State::instance().setState(State::instance().getInternalState());
+
+        	if (State::instance().getPreviousState() == CHARACTER_SELECT) {
+				std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+        	}
+
+            State::instance().handleStateUpdate();
         }
+
+        State::instance().update();
     }
 
     return 0;
@@ -56,6 +66,7 @@ BOOL WINAPI DllMain(HINSTANCE hInst, DWORD fdwReason, LPVOID lpReserved) {
         CreateThread(0, 0x100, dll_thread, hInst, 0, 0);
     } else if (fdwReason == DLL_PROCESS_DETACH) {
         State::instance().setRunning(false);
+    	FreeConsole();
     }
 
     return true;
